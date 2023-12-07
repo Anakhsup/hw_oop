@@ -1,0 +1,20 @@
+#include <iostream> //sem 8
+#include <vector>
+
+int main(){
+	int a, b;
+	int n;
+	std::cin >> n;
+	std::vector<int> num;
+	for (int i = 0; i < n; i++){
+		std::cin >> a >> b;
+		auto it = find(num.begin(), num.end(), b);
+		if (it == num.end())
+			num.push_back(a);
+
+		else
+			num.insert(it, a);
+	}
+	for (int i = 0; i < n; i++) 
+		std::cout << num[i] << "\n";
+}
