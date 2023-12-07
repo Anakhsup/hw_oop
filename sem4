@@ -1,0 +1,85 @@
+#define _CRT_SECURE_NO_WARNINGS //sem 4
+#include <iostream>
+#include <map>
+#include <vector>
+#include <sstream>
+
+using namespace std;
+
+class EarningTracker {
+private:
+    vector<int> earnings;
+
+public:
+    EarningTracker() {
+        earnings.resize(getNumDaysFrom2000ToNow(), 0);
+    }
+
+    void earn(const string& startDate, const string& endDate, int amount) {
+        int start_day = getNumDaysFrom2000(startDate);
+        int end_day = getNumDaysFrom2000(endDate);
+        int numberDay = end_day - start_day + 1;
+        int earningPerDay = amount / numberDay;
+        for (int i = start_day; i <= end_day; ++i) {
+            earnings[i] += earningPerDay;
+        }
+    }
+
+    int show(const string& startDate, const string& endDate) {
+        int startDay = getNumDaysFrom2000(startDate);
+        int endDay = getNumDaysFrom2000(endDate);
+        int totalEarnings = 0;
+        startDay = max(startDay, 0);
+        for (int i = startDay; i <= endDay; ++i) {
+            totalEarnings += earnings[i];
+        }
+        return totalEarnings;
+    }
+
+private:
+    int getNumDaysFrom2000(const string& date) {
+        int year, month, day;
+        sscanf(date.c_str(), "%d-%d-%d", &year, &month, &day);
+        int a = (14 - month) / 12;
+        int y = year - a;
+        int m = month + 12 * a - 2;
+        int numDays = day + (31 * m) / 12 + y * 365 + y / 4 - y / 100 + y / 400;
+        return numDays;
+    }
+
+    int getNumDaysFrom2000ToNow() {
+        time_t now = time(0);
+        tm* timeinfo = localtime(&now);
+        int currentYear = timeinfo->tm_year + 1900;
+        int currentMonth = timeinfo->tm_mon + 1;
+        int currentDay = timeinfo->tm_mday;
+        return getNumDaysFrom2000(to_string(currentYear) + "-" + to_string(currentMonth) + "-" + to_string(currentDay));
+    }
+};
+
+int main() {
+    EarningTracker tracker;
+    int a;
+    string request;
+    cin >> a;
+    cin.ignore();
+
+    for (int i = 0; i < a; ++i) {
+        getline(cin, request);
+        istringstream iss(request);
+        string queryType, startDate, endDate;
+        int amount = 0;
+
+        iss >> queryType >> startDate >> endDate;
+        if (queryType == "Earn") {
+            if (iss >> amount) {
+                tracker.earn(startDate, endDate, amount);
+            }
+        }
+        else if (queryType == "ComputeIncome") {
+            int totalEarnings = tracker.show(startDate, endDate);
+            cout << "Result:" << totalEarnings << "\n" << endl;
+        }
+    }
+    return 0;
+}
